@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System;
 using System.Data;
 using System.Collections;
@@ -90,17 +91,18 @@ public class PlayerIntroMovement : MonoBehaviour
         if(collision.tag == "Beer"){
             DrankBeer = true;
             rb2d.velocity = new Vector2(0, 0);
-            MovementState state;
-
-            state = MovementState.beer;
-            anim.SetInteger("state", (int)state);
             StartCoroutine(StopAnim());
         }
     }
 
     IEnumerator StopAnim(){
+        yield return new WaitForSeconds(1f);
+        MovementState state;
+
+        state = MovementState.beer;
+        anim.SetInteger("state", (int)state);
         yield return new WaitForSeconds(7.91f);
-        MovementState state = MovementState.stay;
+        state = MovementState.stay;
         anim.SetInteger("state", (int)state);
     }
 }
