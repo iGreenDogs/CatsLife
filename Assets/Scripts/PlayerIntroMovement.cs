@@ -19,6 +19,7 @@ public class PlayerIntroMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 7.5f;
 
     [SerializeField] private bool DrankBeer = false;
+    [SerializeField] private int TimeLeftFromJump = 60;
 
     private enum MovementState { idle, moving, jumping, falling, beer, stay }
     // Start is called before the first frame update
@@ -51,10 +52,12 @@ public class PlayerIntroMovement : MonoBehaviour
         }
        
     }
-
+    
     private void UpdateAnimations(float dirX) 
     {
         MovementState state;
+
+        TimeLeftFromJump = TimeLeftFromJump - 1;
 
         if (dirX > 0f)
         {
@@ -68,12 +71,18 @@ public class PlayerIntroMovement : MonoBehaviour
         }
         else
         {
-            state = MovementState.idle;
+            if (TimeLeftFromJump <= 0){
+                state = MovementState.idle;
+            } else {
+                state = MovementState.jumping;
+            }
+
         }
 
         if (rb2d.velocity.y > 0.1f)
         {
             state = MovementState.jumping;
+            TimeLeftFromJump = 60;
         } 
         else if (rb2d.velocity.y < -0.1f)
         {
@@ -102,7 +111,6 @@ public class PlayerIntroMovement : MonoBehaviour
         state = MovementState.beer;
         anim.SetInteger("state", (int)state);
         yield return new WaitForSeconds(7.91f);
-        state = MovementState.stay;
-        anim.SetInteger("state", (int)state);
+        DrankBeer = false;
     }
 }
