@@ -1,10 +1,5 @@
-using System.Net.Mime;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System;
-using System.Data;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -21,15 +16,19 @@ public class PlayerIntroMovement : MonoBehaviour
 
     [SerializeField] private float jumpHight = 7.5f;
     [SerializeField] private float moveSpeed = 7.5f;
-
     [SerializeField] private bool DisableMovement = false;
 
     [SerializeField] private GameObject wall;
     DestroyObject DestroyScript;
     [SerializeField] private GameObject beer;
     DestroyObject magicTrigger;
-    [SerializeField] private GameObject continueText;
+    [SerializeField] private GameObject continueText;    
     TextMeshProUGUI tmpGUI;
+    [SerializeField] private GameObject hiddenEntrance;
+    DestroyObject destroyHidden;
+    
+
+
     bool CanExit = false;
 
     private int frameCount= 0; 
@@ -46,6 +45,7 @@ public class PlayerIntroMovement : MonoBehaviour
         DestroyScript = wall.GetComponent<DestroyObject>();
         magicTrigger = beer.GetComponent<DestroyObject>();
         tmpGUI = continueText.GetComponent<TextMeshProUGUI>();
+        destroyHidden = hiddenEntrance.GetComponent<DestroyObject>();
         // PlayerPrefs.SetInt("Checkpoint", 0);
     }
 
@@ -145,6 +145,9 @@ public class PlayerIntroMovement : MonoBehaviour
         if(collision.tag == "EndPillar"){
             tmpGUI.enabled = true;
             CanExit = true;
+        }
+        if(collision.tag == "Hidden"){
+            destroyHidden.enabled = true;
         }
     }
 
