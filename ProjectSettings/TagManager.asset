@@ -9,6 +9,7 @@ TagManager:
   - ProgressBlocker
   - Portal1_toVoid
   - Portal1_fromVoid
+  - EndPillar
   layers:
   - Default
   - TransparentFX

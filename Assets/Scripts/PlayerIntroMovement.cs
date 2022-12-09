@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System;
@@ -6,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerIntroMovement : MonoBehaviour
 {
@@ -20,12 +22,15 @@ public class PlayerIntroMovement : MonoBehaviour
     [SerializeField] private float jumpHight = 7.5f;
     [SerializeField] private float moveSpeed = 7.5f;
 
-    [SerializeField] private bool DrankBeer = false;
+    [SerializeField] private bool DisableMovement = false;
 
     [SerializeField] private GameObject wall;
     DestroyObject DestroyScript;
     [SerializeField] private GameObject beer;
     DestroyObject magicTrigger;
+    [SerializeField] private GameObject continueText;
+    TextMeshProUGUI tmpGUI;
+    bool CanExit = false;
 
     private int frameCount= 0; 
 
@@ -40,13 +45,14 @@ public class PlayerIntroMovement : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         DestroyScript = wall.GetComponent<DestroyObject>();
         magicTrigger = beer.GetComponent<DestroyObject>();
+        tmpGUI = continueText.GetComponent<TextMeshProUGUI>();
         // PlayerPrefs.SetInt("Checkpoint", 0);
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (!DrankBeer){
+        if (!DisableMovement){
             if (frameCount >= 6){
 
                 float dirX = Input.GetAxis("Horizontal");
@@ -66,9 +72,17 @@ public class PlayerIntroMovement : MonoBehaviour
         }
         frameCount = frameCount + 1;
         if(transform.position.y <= -20){
-        StartCoroutine(reset());
-    }
-       
+            StartCoroutine(reset());
+        }
+        if(CanExit){
+            
+            if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)){
+                PlayerPrefs.SetInt("Checkpoint", 0);
+                PlayerPrefs.SetInt("Level", 1);
+                Application.Quit();
+                UnityEngine.Debug.Log("Quitted");
+            }
+        }
     }
     
     private void UpdateAnimations(float dirX) 
@@ -111,13 +125,14 @@ public class PlayerIntroMovement : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision){
         //Turn to cat
         if(collision.tag == "Beer"){
-            DrankBeer = true;
+            DisableMovement = true;
             rb2d.velocity = new Vector2(0f, rb2d.velocity.y);
             StartCoroutine(StopAnim());
         }
         //Touched a spike
         if(collision.tag == "Killy Thingy"){
-            DrankBeer = true;
+            DisableMovement = true;
+            rb2d.velocity = new Vector2(0f, 0f);
             Destroy(GetComponent<SpriteRenderer>());
             StartCoroutine(reset());
         }
@@ -127,6 +142,16 @@ public class PlayerIntroMovement : MonoBehaviour
         if(collision.tag == "Portal1_fromVoid"){
             transform.position=new Vector2(42.5f, 1f);
         }
+        if(collision.tag == "EndPillar"){
+            tmpGUI.enabled = true;
+            CanExit = true;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        tmpGUI.enabled = false;
+        CanExit = false;
     }
 
     //Fell in void
@@ -141,7 +166,7 @@ public class PlayerIntroMovement : MonoBehaviour
         anim.SetInteger("state", (int)state);
         yield return new WaitForSeconds(7.91f);
         DestroyScript.enabled = true;
-        DrankBeer = false;
+        DisableMovement = false;
         PlayerPrefs.SetInt("Checkpoint", 1);
         UnityEngine.Debug.Log(PlayerPrefs.GetInt("Checkpoint"));
     }
