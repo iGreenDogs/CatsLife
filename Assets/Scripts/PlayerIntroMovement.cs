@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System;
 using System.Data;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerIntroMovement : MonoBehaviour
 {
@@ -19,7 +21,14 @@ public class PlayerIntroMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 7.5f;
 
     [SerializeField] private bool DrankBeer = false;
-    [SerializeField] private int TimeLeftFromJump = 60;
+
+    [SerializeField] private GameObject wall;
+    DestroyObject DestroyScript;
+    [SerializeField] private GameObject beer;
+    DestroyObject magicTrigger;
+
+    private int frameCount= 0; 
+
 
     private enum MovementState { idle, moving, jumping, falling, beer, stay }
     // Start is called before the first frame update
@@ -29,27 +38,36 @@ public class PlayerIntroMovement : MonoBehaviour
         coll = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
+        DestroyScript = wall.GetComponent<DestroyObject>();
+        magicTrigger = beer.GetComponent<DestroyObject>();
+        // PlayerPrefs.SetInt("Checkpoint", 0);
     }
 
     // Update is called once per frame
     private void Update()
     {
         if (!DrankBeer){
+            if (frameCount >= 6){
 
-            float dirX = Input.GetAxis("Horizontal");
+                float dirX = Input.GetAxis("Horizontal");
 
-            rb2d.velocity = new Vector2(moveSpeed * dirX, rb2d.velocity.y);
+                rb2d.velocity = new Vector2(moveSpeed * dirX, rb2d.velocity.y);
 
-            if (Input.GetKeyDown("space") || Input.GetKeyDown("w") || Input.GetKeyDown("up"))
-            {
-                if (IsGrounded())
+                if (Input.GetKeyDown("space") || Input.GetKeyDown("w") || Input.GetKeyDown("up"))
                 {
-                    rb2d.velocity = new Vector2(rb2d.velocity.x, jumpHight);
-                }   
-            }
+                    if (IsGrounded())
+                    {
+                        rb2d.velocity = new Vector2(rb2d.velocity.x, jumpHight);
+                    }   
+                }
 
-            UpdateAnimations(dirX);
+                UpdateAnimations(dirX);
+            }
         }
+        frameCount = frameCount + 1;
+        if(transform.position.y <= -20){
+        StartCoroutine(reset());
+    }
        
     }
     
@@ -57,7 +75,6 @@ public class PlayerIntroMovement : MonoBehaviour
     {
         MovementState state;
 
-        TimeLeftFromJump = TimeLeftFromJump - 1;
 
         if (dirX > 0f)
         {
@@ -71,18 +88,13 @@ public class PlayerIntroMovement : MonoBehaviour
         }
         else
         {
-            if (TimeLeftFromJump <= 0){
-                state = MovementState.idle;
-            } else {
-                state = MovementState.jumping;
-            }
+            state = MovementState.idle;
 
         }
 
         if (rb2d.velocity.y > 0.1f)
         {
             state = MovementState.jumping;
-            TimeLeftFromJump = 60;
         } 
         else if (rb2d.velocity.y < -0.1f)
         {
@@ -97,20 +109,45 @@ public class PlayerIntroMovement : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D collision){
+        //Turn to cat
         if(collision.tag == "Beer"){
             DrankBeer = true;
-            rb2d.velocity = new Vector2(0, 0);
+            rb2d.velocity = new Vector2(0f, rb2d.velocity.y);
             StartCoroutine(StopAnim());
+        }
+        //Touched a spike
+        if(collision.tag == "Killy Thingy"){
+            DrankBeer = true;
+            Destroy(GetComponent<SpriteRenderer>());
+            StartCoroutine(reset());
+        }
+        if(collision.tag == "Portal1_toVoid"){
+            transform.position=new Vector2(44.25f, -9f);
+        }
+        if(collision.tag == "Portal1_fromVoid"){
+            transform.position=new Vector2(42.5f, 1f);
         }
     }
 
+    //Fell in void
+    
+
     IEnumerator StopAnim(){
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2.5f);
+        magicTrigger.enabled = true;
         MovementState state;
 
         state = MovementState.beer;
         anim.SetInteger("state", (int)state);
         yield return new WaitForSeconds(7.91f);
+        DestroyScript.enabled = true;
         DrankBeer = false;
+        PlayerPrefs.SetInt("Checkpoint", 1);
+        UnityEngine.Debug.Log(PlayerPrefs.GetInt("Checkpoint"));
+    }
+
+    IEnumerator reset(){
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("Foreward");
     }
 }
