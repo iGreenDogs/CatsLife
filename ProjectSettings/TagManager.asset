@@ -11,6 +11,7 @@ TagManager:
   - Portal1_fromVoid
   - EndPillar
   - Hidden
+  - LVL2_portal
   layers:
   - Default
   - TransparentFX
