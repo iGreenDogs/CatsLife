@@ -17,8 +17,33 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float jumpHight = 7.5f;
     [SerializeField] private float moveSpeed = 7.5f;
+    [SerializeField] private GameObject continueText;    
+    TextMeshProUGUI tmpGUI;
 
     [SerializeField] private LayerMask jumpableGround;
+
+    [SerializeField] private Vector2[] portalDumps = {
+        new Vector2(18,-3.5f),
+        new Vector2(24,-3.5f),
+        new Vector2(30,-3.5f),
+        new Vector2(36,-3.5f),
+        new Vector2(18,0),
+        new Vector2(24,0),
+        new Vector2(30,0),
+        new Vector2(36,0),
+        new Vector2(18,4.5f),
+        new Vector2(24,4.5f),
+        new Vector2(30,4.5f),
+        new Vector2(36,4.5f),
+        new Vector2(18,8),
+        new Vector2(24,8),
+        new Vector2(30,8),
+        new Vector2(36,8),
+        new Vector2(-6,16.5f),
+        new Vector2(-6.5f,1)
+    };
+
+    
 
 
     private enum MovementState { idle, moving, falljump }
@@ -28,6 +53,7 @@ public class Player : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         rb2d = GetComponent<Rigidbody2D>();
         coll = GetComponent<BoxCollider2D>();
+        tmpGUI = continueText.GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
@@ -50,13 +76,16 @@ public class Player : MonoBehaviour
 
                 UpdateAnimations(dirX);
         }
+        if(transform.position.y <= -20){
+            StartCoroutine(reset());
+        }
         //Exit Level
         if(CanExit){
             
             if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)){
                 PlayerPrefs.SetInt("Checkpoint", 0);
-                PlayerPrefs.SetInt("Level", 2);
-                SceneManager.LoadScene(2);
+                PlayerPrefs.SetInt("Level", 3);
+                SceneManager.LoadScene(3);
             }
         }
     }
@@ -97,5 +126,29 @@ public class Player : MonoBehaviour
     //Checks if player is touching ground
     private bool IsGrounded() {
         return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpableGround);   
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "LVL2_portal"){
+            
+            int randomIndex = Random.Range(0, portalDumps.Length);
+            transform.position = portalDumps[randomIndex];
+        }
+        if(collision.tag == "EndPillar"){
+            tmpGUI.enabled = true;
+            CanExit = true;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        tmpGUI.enabled = false;
+        CanExit = false;
+    }
+
+    IEnumerator reset(){
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("Foreward");
     }
 }
