@@ -6803,11 +6803,14 @@ MonoBehaviour:
   CanExit: 0
   jumpHight: 7.5
   moveSpeed: 7.5
+  portalTimes: 0
   continueText: {fileID: 1687804105}
   jumpableGround:
     serializedVersion: 2
     m_Bits: 8
   portalDumps:
+  - {x: -6, y: 16.5}
+  - {x: -6.5, y: 1}
   - {x: 18, y: -3.5}
   - {x: 24, y: -3.5}
   - {x: 30, y: -3.5}

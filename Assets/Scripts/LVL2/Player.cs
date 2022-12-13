@@ -17,12 +17,14 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float jumpHight = 7.5f;
     [SerializeField] private float moveSpeed = 7.5f;
-    [SerializeField] private GameObject continueText;    
+    [SerializeField] private GameObject continueText;   
     TextMeshProUGUI tmpGUI;
 
     [SerializeField] private LayerMask jumpableGround;
 
-    [SerializeField] private Vector2[] portalDumps = {
+    private Vector2[] portalDumps = {
+        new Vector2(-6,16.5f),
+        new Vector2(-6.5f,1),
         new Vector2(18,-3.5f),
         new Vector2(24,-3.5f),
         new Vector2(30,-3.5f),
@@ -38,9 +40,7 @@ public class Player : MonoBehaviour
         new Vector2(18,8),
         new Vector2(24,8),
         new Vector2(30,8),
-        new Vector2(36,8),
-        new Vector2(-6,16.5f),
-        new Vector2(-6.5f,1)
+        new Vector2(36,8)
     };
 
     
