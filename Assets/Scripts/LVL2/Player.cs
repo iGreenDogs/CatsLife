@@ -149,6 +149,6 @@ public class Player : MonoBehaviour
 
     IEnumerator reset(){
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("Foreward");
+        SceneManager.LoadScene("LVL2");
     }
 }
