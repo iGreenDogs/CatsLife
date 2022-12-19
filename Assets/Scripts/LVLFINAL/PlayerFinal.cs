@@ -33,6 +33,9 @@ public class PlayerFinal : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            SceneManager.LoadScene(0);
+        }
         frame = frame + 1;
         if (!DisableMovement){
 

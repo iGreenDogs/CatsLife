@@ -70,6 +70,9 @@ public class PlayerIntroMovement : MonoBehaviour
                 UpdateAnimations(dirX);
             }
         }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            SceneManager.LoadScene(0);
+        }
         frameCount = frameCount + 1;
         if(transform.position.y <= -20){
             StartCoroutine(reset());
