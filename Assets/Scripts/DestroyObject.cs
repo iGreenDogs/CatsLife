@@ -9,6 +9,13 @@ public class DestroyObject : MonoBehaviour
     
     void Start()
     {
-        Destroy(self);
+        if (self != null){
+            Destroy(self);
+        }
+    }
+    private void Update() {
+        if (self != null){
+            Destroy(self);
+        }
     }
 }
