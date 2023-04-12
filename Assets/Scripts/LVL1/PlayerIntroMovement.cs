@@ -129,6 +129,7 @@ public class PlayerIntroMovement : MonoBehaviour
         if(collision.tag == "Beer"){
             DisableMovement = true;
             rb2d.velocity = new Vector2(0f, rb2d.velocity.y);
+            HotCocoaStep1();
             StartCoroutine(StopAnim());
         }
         //Touched a spike
@@ -163,23 +164,29 @@ public class PlayerIntroMovement : MonoBehaviour
     
 
     IEnumerator StopAnim(){
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(7.9f);
+        HotCocoaStep2();
+    }
+
+    IEnumerator reset(){
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("Foreward");
+    }
+    
+    void HotCocoaStep1(){
         magicTrigger.enabled = true;
         MovementState state;
 
         state = MovementState.beer;
         anim.SetInteger("state", (int)state);
-        yield return new WaitForSeconds(7.91f);
+        StartCoroutine(StopAnim());
+    }
+    void HotCocoaStep2() {
         DestroyScript.enabled = true;
         DisableMovement = false;
         if(!(PlayerPrefs.GetInt("Level") > 1)){
             PlayerPrefs.SetInt("Checkpoint", 1);
         }
         UnityEngine.Debug.Log(PlayerPrefs.GetInt("Checkpoint"));
-    }
-
-    IEnumerator reset(){
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("Foreward");
     }
 }
